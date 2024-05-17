@@ -1,0 +1,36 @@
+{
+  "name": "noho-app",
+  "version": "0.0.1",
+  "description": "",
+  "author": "",
+  "private": true,
+  "license": "MIT",
+  "config": {
+    "commitizen": {
+      "path": "@commitlint/cz-commitlint"
+    }
+  },
+  "scripts": {
+    "dev": "bun run --hot src/index.ts",
+    "start:prod": "bun dist/index.js",
+    "prebuild": "rimraf dist",
+    "build": "bun build src/index.ts --minify --outdir dist --outfile=index.js",
+    "lint": "bunx @biomejs/biome lint --apply src",
+    "format": "bunx @biomejs/biome format --write src",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "hono": "^4.3.7"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.7.3",
+    "@commitlint/cli": "^19.3.0",
+    "@commitlint/config-conventional": "^19.2.2",
+    "@commitlint/cz-commitlint": "^19.2.0",
+    "commitizen": "^4.3.0",
+    "commitlint": "^19.3.0",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
+    "rimraf": "^5.0.7"
+  }
+}
