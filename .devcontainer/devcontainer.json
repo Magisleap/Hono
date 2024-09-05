@@ -9,15 +9,20 @@
     "source=${env:HOME}/home/bun/.ssh,target=/.ssh,type=bind,consistency=cached,readonly"
   ],
   "features": {
-    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/git:1": {
+      "version": "2.37.0"
+    },
     "ghcr.io/devcontainers/features/common-utils:2": {
       "configureZshAsDefaultShell": true
     },
-    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/node:1.5.0": {
+      "version": "20.16.0"
+    },
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
       "moby": false,
       "dockerDashComposeVersion": "v2"
-    }
+    },
+    "ghcr.io/dhoeric/features/act:1": {}
   },
   "postAttachCommand": "/bin/sh .devcontainer/postAttachCommand.sh",
   "postCreateCommand": "/bin/sh .devcontainer/postCreateCommand.sh",
@@ -30,9 +35,9 @@
         "PKief.material-icon-theme",
         "antfu.file-nesting",
         "biomejs.biome",
-        "bradlc.vscode-tailwindcss",
         "eamodio.gitlens",
-        "ms-vscode.vscode-typescript-next"
+        "ms-vscode.vscode-typescript-next",
+        "tamasfe.even-better-toml"
       ],
       "settings": {
         "betterTypeScriptErrors.prettify": true,

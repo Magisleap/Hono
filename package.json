@@ -1,8 +1,8 @@
 {
-  "name": "noho-app",
+  "name": "hono_workers_example",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "Hono + Cloudflare Workers API Example",
+  "author": "AUTHORE NAME",
   "private": true,
   "license": "MIT",
   "config": {
@@ -11,7 +11,7 @@
     }
   },
   "scripts": {
-    "dev": "bun run --hot src/index.ts",
+    "dev": "wrangler dev src/index.ts --test-scheduled",
     "start:prod": "bun dist/index.js",
     "prebuild": "rimraf dist",
     "build": "bun build src/index.ts --minify --outdir dist --outfile=index.js",
@@ -20,17 +20,23 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "hono": "^4.3.7"
+    "hono": "^4.3.7",
+    "lodash": "^4.17.21",
+    "ls": "^0.2.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.7.3",
+    "@biomejs/biome": "^1.8.3",
+    "@cloudflare/workers-types": "^4.20240725.0",
     "@commitlint/cli": "^19.3.0",
     "@commitlint/config-conventional": "^19.2.2",
     "@commitlint/cz-commitlint": "^19.2.0",
+    "@hono/zod-openapi": "^0.15.1",
+    "@scalar/hono-api-reference": "^0.5.120",
+    "@types/bun": "latest",
+    "@types/lodash": "^4.17.7",
+    "@types/node": "^22.5.4",
     "commitizen": "^4.3.0",
-    "commitlint": "^19.3.0",
-    "husky": "^9.0.11",
-    "lint-staged": "^15.2.2",
-    "rimraf": "^5.0.7"
+    "husky": "^9.1.3",
+    "wrangler": "3.18.0"
   }
 }
