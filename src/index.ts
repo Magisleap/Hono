@@ -23,6 +23,7 @@ app.onError((err, c) => {
   console.error(err)
   return c.text('Internal Server Error', 500)
 })
+app.notFound((c) => c.redirect('/docs'))
 
 export default {
   port: 3000,
