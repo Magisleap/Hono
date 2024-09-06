@@ -37,7 +37,9 @@
         "biomejs.biome",
         "eamodio.gitlens",
         "ms-vscode.vscode-typescript-next",
-        "tamasfe.even-better-toml"
+        "tamasfe.even-better-toml",
+        "bierner.markdown-mermaid",
+        "bierner.markdown-preview-github-styles"
       ],
       "settings": {
         "betterTypeScriptErrors.prettify": true,
