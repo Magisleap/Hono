@@ -1,5 +1,5 @@
 import { HTTPMethod } from '@/enums/method'
-import { basicAuth } from '@/middlewares/basic_auth.middleware'
+import { Status } from '@/enums/status'
 import { BadRequestResponse } from '@/utils/bad_request.response'
 import type { Bindings } from '@/utils/bindings'
 import { OpenAPIHono as Hono, createRoute, z } from '@hono/zod-openapi'
@@ -20,11 +20,16 @@ app.openapi(
     path: '/',
     tags: ['購読'],
     summary: '一覧取得',
-    description: '価格詳細を取得します',
+    description: '購読一覧を取得します',
     request: {
       headers: z.object({
         'x-api-key': z.string().optional().openapi({
           description: 'APIキー'
+        })
+      }),
+      query: z.object({
+        status: z.nativeEnum(Status).optional().default(Status.ACTIVE).openapi({
+          description: 'ステータス'
         })
       })
     },
@@ -46,13 +51,22 @@ app.openapi(
   }),
   async (c) => {
     const { 'x-api-key': api_key } = c.req.valid('header')
+    const { status } = c.req.valid('query')
     const stripe: Stripe = new Stripe(c.env.STRIPE_API_KEY_SECRET, {
       apiVersion: '2024-06-20'
     })
-    if (api_key !== c.env.API_KEY) {
+    // 開発環境ではAPIキーをチェックしない
+    if (
+      api_key !== c.env.API_KEY &&
+      new URL(c.req.url).hostname !== 'localhost' &&
+      new URL(c.req.url).hostname !== '0.0.0.0'
+    ) {
       throw new HTTPException(403, { message: 'Forbidden' })
     }
-    const subscriptions = await stripe.subscriptions.list()
+    const subscriptions = await stripe.subscriptions.list({
+      limit: 25,
+      status: status
+    })
     return c.json(subscriptions)
   }
 )
