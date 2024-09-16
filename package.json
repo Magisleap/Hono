@@ -1,8 +1,8 @@
 {
-  "name": "hono_workers_example",
+  "name": "stripe_api_server",
   "version": "0.0.1",
-  "description": "Hono + Cloudflare Workers API Example",
-  "author": "AUTHORE NAME",
+  "description": "StripeのAPIをコールしてプロダクト商品などを取得するAPIです",
+  "author": "tkgling",
   "private": true,
   "license": "MIT",
   "config": {
@@ -20,23 +20,25 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "hono": "^4.3.7",
+    "dayjs": "^1.11.13",
+    "hono": "^4.6.1",
     "lint-staged": "^15.2.10",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "stripe": "^16.11.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.8.3",
-    "@cloudflare/workers-types": "^4.20240725.0",
-    "@commitlint/cli": "^19.3.0",
-    "@commitlint/config-conventional": "^19.2.2",
-    "@commitlint/cz-commitlint": "^19.2.0",
-    "@hono/zod-openapi": "^0.15.1",
-    "@scalar/hono-api-reference": "^0.5.120",
-    "@types/bun": "latest",
+    "@biomejs/biome": "^1.9.1",
+    "@cloudflare/workers-types": "^4.20240909.0",
+    "@commitlint/cli": "^19.5.0",
+    "@commitlint/config-conventional": "^19.5.0",
+    "@commitlint/cz-commitlint": "^19.5.0",
+    "@hono/zod-openapi": "^0.16.0",
+    "@scalar/hono-api-reference": "^0.5.146",
+    "@types/bun": "^1.1.9",
     "@types/lodash": "^4.17.7",
-    "@types/node": "^22.5.4",
+    "@types/node": "^22.5.5",
     "commitizen": "^4.3.0",
-    "husky": "^9.1.3",
+    "husky": "^9.1.6",
     "wrangler": "3.17.0"
   }
 }

@@ -1,4 +1,4 @@
-name = "hono_workers_example"
+name = "stripe_api"
 compatibility_date = "2024-07-22"
 send_metrics = true
 compatibility_flags = ["nodejs_compat"]

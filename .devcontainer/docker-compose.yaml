@@ -1,5 +1,5 @@
 services:
-  hono:
+  stripe:
     build:
       context: .
       dockerfile: Dockerfile
