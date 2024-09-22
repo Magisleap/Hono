@@ -82,6 +82,32 @@ app.openapi(
           allow_promotion_codes: true
         }
       },
+      custom_fields: [
+        {
+          key: 'npln_user_id',
+          label: {
+            type: 'custom',
+            custom: 'NPLNユーザーID'
+          },
+          text: {
+            minimum_length: 20,
+            maximum_length: 20
+          },
+          type: 'text'
+        },
+        {
+          key: 'network_service_id',
+          label: {
+            type: 'custom',
+            custom: 'ネットワークサービスID'
+          },
+          text: {
+            minimum_length: 16,
+            maximum_length: 16
+          },
+          type: 'text'
+        }
+      ],
       success_url: parameters.success_url,
       cancel_url: parameters.cancel_url,
       client_reference_id: parameters.client_reference_id,
