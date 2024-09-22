@@ -56,14 +56,24 @@ bun dev
 
 DevContainer環境で開発する場合, `bun wrangler login`が正常にリダイレクトされないため`CLOUDFLARE_API_TOKEN`を`.env`に書き込んでください.
 
-トークンの発行方法については[公式ドキュメント](https://developers.cloudflare.com/fundamentals/api/get-started/create-token/)を読んでください
+トークンの発行方法については[公式ドキュメント](https://developers.cloudflare.com/fundamentals/api/get-started/create-token/)を読んでください.
 
 ```zsh
 CLOUDFLARE_ACCOUNT_ID=
 CLOUDFLARE_API_TOKEN=
 ```
 
-> `CLOUDFLARE_ACCOUNT_ID`はおそらく不要です
+> `CLOUDFLARE_ACCOUNT_ID`はおそらく不要です.
+
+### Stripe
+
+本アプリケーションはStripe SDKを利用しています.
+
+```zsh
+stripe login
+```
+
+で認証ページを開いてからログインすることで90日有効なトークンが取得できます.
 
 ### デプロイ
 

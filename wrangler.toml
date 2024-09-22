@@ -1,4 +1,5 @@
 name = "stripe_api"
+main = "src/index.ts"
 compatibility_date = "2024-07-22"
 send_metrics = true
 compatibility_flags = ["nodejs_compat"]
@@ -10,9 +11,9 @@ logpush = true
 # ]
 
 # Cloudflare Workers KV namespaces
-# kv_namespaces = [
-#   { binding = "HONO_WORKERS_EXAMPLE", id = "HONO_WORKERS_EXAMPLE", preview_id = "HONO_WORKERS_EXAMPLE_PREVIEW" },
-# ]
+kv_namespaces = [
+  { binding = "STRIPE_INVOICE_PAYMENT", id = "7b1cffc8ff7e491eb7e30c2edeed9b76", preview_id = "6fbe144d9d3c4269916d2dfcaa3027e8" },
+]
 
 # Cron Events
 [triggers]
@@ -20,3 +21,5 @@ crons = []
 
 # Variables
 [vars]
+
+[env.dev]

@@ -26,11 +26,6 @@ app.openapi(
         'x-api-key': z.string().optional().openapi({
           description: 'APIキー'
         })
-      }),
-      query: z.object({
-        status: z.nativeEnum(Status).optional().default(Status.ACTIVE).openapi({
-          description: 'ステータス'
-        })
       })
     },
     responses: {
@@ -51,10 +46,6 @@ app.openapi(
   }),
   async (c) => {
     const { 'x-api-key': api_key } = c.req.valid('header')
-    const { status } = c.req.valid('query')
-    const stripe: Stripe = new Stripe(c.env.STRIPE_API_KEY_SECRET, {
-      apiVersion: '2024-06-20'
-    })
     // 開発環境ではAPIキーをチェックしない
     if (
       api_key !== c.env.API_KEY &&
@@ -63,10 +54,12 @@ app.openapi(
     ) {
       throw new HTTPException(403, { message: 'Forbidden' })
     }
-    const subscriptions = await stripe.subscriptions.list({
-      limit: 25,
-      status: status
-    })
-    return c.json(subscriptions)
+    // const subscriptions = await stripe.subscriptions.list({
+    //   limit: 10,
+    //   status: status
+    // })
+    const keys: string[] = (await c.env.STRIPE_INVOICE_PAYMENT.list({ limit: 25 })).keys.map((key) => key.name)
+    const payments = await Promise.all(keys.map((key) => c.env.STRIPE_INVOICE_PAYMENT.get(key, { type: 'json' })))
+    return c.json(payments)
   }
 )

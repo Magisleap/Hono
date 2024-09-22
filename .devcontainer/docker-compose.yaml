@@ -1,10 +1,32 @@
 services:
+  stripe_cli:
+    image: stripe/stripe-cli:latest
+    entrypoint: sh
+    command: -c "stripe listen --api-key ${STRIPE_SECRET_KEY} --events checkout.session.completed,customer.subscription.created,customer.subscription.deleted,customer.subscription.updated,invoice.payment_failed,invoice.payment_succeeded --forward-to http://host.docker.internal:8787/webhook --print-json > /app/logs/stripe.log 2>&1"
+    # command:
+    #   - -c
+    #   - stripe
+    #   - listen
+    #   - --api-key
+    #   - ${STRIPE_SECRET_KEY}
+    #   - --device-name
+    #   - ${STRIPE_DEVICE_NAME}
+    #   - --events
+    #   - checkout.session.completed,customer.subscription.created,customer.subscription.deleted,customer.subscription.updated,invoice.payment_failed,invoice.payment_succeeded
+    #   - --forward-to
+    #   - http://host.docker.internal:8787/webhook
+    #   - '> /app/logs/stripe.log 2>&1'
+    volumes:
+      - ./logs:/app/logs
+
   stripe:
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        BUN_VERSION: 1.1.26
+        BUN_VERSION: 1.1.29
+    environment:
+      STRIPE_SECRET_KEY: $STRIPE_SECRET_KEY
     volumes:
       - node_modules:/home/bun/app/node_modules
       - ../:/home/bun/app:cached
