@@ -4,10 +4,15 @@ import { Webhook } from '@/models/webhook'
 import { BadRequestResponse } from '@/utils/bad_request.response'
 import type { Bindings } from '@/utils/bindings'
 import { OpenAPIHono as Hono, createRoute, z } from '@hono/zod-openapi'
+import dayjs from 'dayjs'
 import type { Context } from 'hono'
 import { HTTPException } from 'hono/http-exception'
-import { merge } from 'lodash'
+import { decode, sign, verify } from 'hono/jwt'
+import { AlgorithmTypes } from 'hono/utils/jwt/jwa'
+import type { JWTPayload } from 'hono/utils/jwt/types'
+import { type extend, fromPairs, merge, omit, sortBy, toPairs } from 'lodash'
 import Stripe from 'stripe'
+import { v4 as uuidv4 } from 'uuid'
 
 export const app = new Hono<{ Bindings: Bindings }>()
 
@@ -53,40 +58,65 @@ app.openapi(
 const handle_webhook = async (c: Context<{ Bindings: Bindings }>, event: Stripe.Event) => {
   switch (event.type) {
     case 'checkout.session.completed':
-      await handle_session(c, event)
-      break
+      return handle_session(c, Webhook.CheckoutSession.parse(event))
     case 'customer.subscription.created':
       break
     case 'customer.subscription.updated':
       break
     case 'invoice.payment_succeeded':
-      await handle_invoice_payment(c, event)
-      break
+      return await handle_invoice_payment(c, Webhook.InvoicePayment.parse(event))
     default:
       break
   }
 }
 
-const handle_session = async (c: Context<{ Bindings: Bindings }>, event: Stripe.Event) => {
-  const session: Webhook.CheckoutSession = Webhook.CheckoutSession.parse(event)
-  console.log('[CHECKOUT SESSION COMPLETED]', JSON.stringify(session, null, 2))
-  if (session.client_reference_id === undefined) {
+const handle_session = async (c: Context<{ Bindings: Bindings }>, event: Webhook.CheckoutSession) => {
+  console.log('[CHECKOUT SESSION COMPLETED]', JSON.stringify(event, null, 2))
+  if (event.client_reference_id === undefined) {
     throw new HTTPException(400, { message: 'Bad Request.' })
   }
   // 確実に書き込み完了するまで待つ
-  await c.env.STRIPE_INVOICE_PAYMENT.put(session.customer, JSON.stringify(session))
+  await c.env.STRIPE_INVOICE_PAYMENT.put(event.customer, JSON.stringify(event))
 }
 
-const handle_invoice_payment = async (c: Context<{ Bindings: Bindings }>, event: Stripe.Event) => {
-  const payment: Webhook.InvoicePayment = Webhook.InvoicePayment.parse(event)
-  console.log('[INVOICE PAYMENT SUCCEEDED]', JSON.stringify(payment, null, 2))
+const handle_invoice_payment = async (c: Context<{ Bindings: Bindings }>, event: Webhook.InvoicePayment) => {
+  console.log('[INVOICE PAYMENT SUCCEEDED]', JSON.stringify(event, null, 2))
   // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  const customer: any | null = await c.env.STRIPE_INVOICE_PAYMENT.get(payment.customer, { type: 'json' })
+  const customer: any | null = await c.env.STRIPE_INVOICE_PAYMENT.get(event.customer, { type: 'json' })
   if (customer === null) {
     throw new HTTPException(404, { message: 'Not Found.' })
   }
   // 支払い情報をマージする
   // このカスみたいな方法を利用しないと正しくマージされない
-  const merged = merge({}, customer, payment.toJSON())
-  await c.env.STRIPE_INVOICE_PAYMENT.put(payment.customer, JSON.stringify(merged))
+  const payload = merge({}, customer, event.toJSON())
+  await c.env.STRIPE_INVOICE_PAYMENT.put(event.customer, JSON.stringify(payload))
+  return handle_token(c, payload)
+}
+
+const handle_token = async <T extends Webhook.InvoicePayment>(c: Context<{ Bindings: Bindings }>, event: T) => {
+  const payload: JWTPayload = fromPairs(
+    sortBy(
+      toPairs({
+        ...omit(event, [
+          'period',
+          'subscription',
+          'invoice',
+          'product',
+          'client_reference_id',
+          'status',
+          'payment_status',
+          'customer'
+        ]),
+        iss: new URL(c.req.url).hostname,
+        sub: event.customer,
+        typ: 'access_token',
+        nbf: dayjs(event.period.start).unix(),
+        iat: dayjs().unix(),
+        exp: dayjs(event.period.end).unix()
+      })
+    )
+  )
+  const access_token: string = await sign(payload, c.env.JWT_SECRET_KEY, AlgorithmTypes.HS256)
+  console.log(access_token)
+  return c.json({ access_token: access_token })
 }

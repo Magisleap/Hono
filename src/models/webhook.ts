@@ -1,3 +1,4 @@
+import { subscribe } from 'node:diagnostics_channel'
 import { z } from '@hono/zod-openapi'
 import { fromPairs, values } from 'lodash'
 import { DataObject } from './data.object.dto'
@@ -69,6 +70,7 @@ export namespace Webhook {
     return {
       ...v.data.object,
       type: v.type,
+      period: v.data.object.lines[0].period,
       toJSON() {
         return {
           customer: v.data.object.customer,
@@ -119,7 +121,8 @@ export namespace Webhook {
             value: z.string().or(z.number())
           })
         })
-      )
+      ),
+      metadata: z.record(z.string().or(z.number()))
     })
   ).transform((v) => {
     return {
@@ -128,6 +131,7 @@ export namespace Webhook {
       toJSON() {
         return {
           ...Object.fromEntries(v.data.object.custom_fields.map((field) => [field.key, field.text.value])),
+          ...v.data.object.metadata,
           client_reference_id: v.data.object.client_reference_id,
           customer: v.data.object.customer,
           subscription: v.data.object.subscription,

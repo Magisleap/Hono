@@ -73,7 +73,8 @@ app.openapi(
                     type: z.enum(['text'])
                   })
                 )
-                .optional()
+                .optional(),
+              metadata: z.record(z.string().or(z.number())).optional()
             })
           }
         }
@@ -113,7 +114,7 @@ app.openapi(
         }
       ],
       locale: 'ja',
-      metadata: {},
+      metadata: parameters.metadata,
       mode: parameters.mode
     })
     return c.json(checkout)
