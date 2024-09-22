@@ -1,5 +1,5 @@
 import { z } from '@hono/zod-openapi'
-import { fromPairs } from 'lodash'
+import { fromPairs, values } from 'lodash'
 import { DataObject } from './data.object.dto'
 
 export namespace Webhook {
@@ -111,7 +111,15 @@ export namespace Webhook {
       customer: z.string().regex(/^cus_[\w].*$/),
       invoice: z.string().regex(/^in_[\w].*$/),
       subscription: z.string().regex(/^sub_[\w].*$/),
-      ui_mode: z.enum(['embedded', 'hosted']).nullable()
+      ui_mode: z.enum(['embedded', 'hosted']).nullable(),
+      custom_fields: z.array(
+        z.object({
+          key: z.string(),
+          text: z.object({
+            value: z.string().or(z.number())
+          })
+        })
+      )
     })
   ).transform((v) => {
     return {
@@ -119,11 +127,12 @@ export namespace Webhook {
       type: v.type,
       toJSON() {
         return {
+          ...Object.fromEntries(v.data.object.custom_fields.map((field) => [field.key, field.text.value])),
+          client_reference_id: v.data.object.client_reference_id,
           customer: v.data.object.customer,
           subscription: v.data.object.subscription,
           invoice: v.data.object.invoice,
           status: v.data.object.status,
-          client_reference_id: v.data.object.client_reference_id,
           payment_status: v.data.object.payment_status
         }
       }

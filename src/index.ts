@@ -9,6 +9,8 @@ import { csrf } from 'hono/csrf'
 import { HTTPException } from 'hono/http-exception'
 import { type JwtVariables as Variables, jwt } from 'hono/jwt'
 import { logger } from 'hono/logger'
+import { JwtTokenExpired } from 'hono/utils/jwt/types'
+import { ZodError } from 'zod'
 import { app as checkout } from './api/checkout'
 import { app as prices } from './api/prices'
 import { app as products } from './api/products'
@@ -42,6 +44,9 @@ app.get('/docs', apiReference(reference))
 app.onError((err, c) => {
   if (err instanceof HTTPException) {
     return c.json({ message: err.message }, err.status)
+  }
+  if (err instanceof ZodError) {
+    return c.json({ message: JSON.parse(err.message) }, 400)
   }
   console.error(err)
   return c.text('Internal Server Error', 500)
