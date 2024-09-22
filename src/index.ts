@@ -7,18 +7,26 @@ import { cache } from 'hono/cache'
 import { cors } from 'hono/cors'
 import { csrf } from 'hono/csrf'
 import { HTTPException } from 'hono/http-exception'
+import { type JwtVariables as Variables, jwt } from 'hono/jwt'
 import { logger } from 'hono/logger'
-import Stripe from 'stripe'
 import { app as checkout } from './api/checkout'
 import { app as prices } from './api/prices'
 import { app as products } from './api/products'
 import { app as subscriptions } from './api/subscriptions'
 import { app as webhook } from './api/webhook'
+import { jwtAuth } from './middlewares/jwt_auth'
 import type { Bindings } from './utils/bindings'
 import { reference, specification } from './utils/docs'
 import { scheduled } from './utils/handler'
 
-const app = new Hono<{ Bindings: Bindings }>()
+const app = new Hono<{ Bindings: Bindings; Variables: Variables }>()
+
+app.openAPIRegistry.registerComponent('securitySchemes', 'Bearer', {
+  type: 'http',
+  scheme: 'bearer',
+  in: 'header',
+  description: 'Bearer Token'
+})
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -27,6 +35,7 @@ dayjs.tz.setDefault('Asia/Tokyo')
 app.use(logger())
 app.use(csrf())
 app.use('*', cors())
+// app.use('*', jwtAuth)
 app.notFound((c) => c.redirect('/docs'))
 app.doc('/specification', specification)
 app.get('/docs', apiReference(reference))
