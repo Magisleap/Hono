@@ -9,14 +9,14 @@ import { csrf } from 'hono/csrf'
 import { HTTPException } from 'hono/http-exception'
 import { logger } from 'hono/logger'
 import Stripe from 'stripe'
-import { app as checkout } from './checkout'
-import { app as prices } from './prices'
-import { app as products } from './products'
-import { app as subscriptions } from './subscriptions'
+import { app as checkout } from './api/checkout'
+import { app as prices } from './api/prices'
+import { app as products } from './api/products'
+import { app as subscriptions } from './api/subscriptions'
+import { app as webhook } from './api/webhook'
 import type { Bindings } from './utils/bindings'
 import { reference, specification } from './utils/docs'
 import { scheduled } from './utils/handler'
-import { app as webhook } from './webhook'
 
 const app = new Hono<{ Bindings: Bindings }>()
 
@@ -27,6 +27,7 @@ dayjs.tz.setDefault('Asia/Tokyo')
 app.use(logger())
 app.use(csrf())
 app.use('*', cors())
+app.notFound((c) => c.redirect('/docs'))
 app.doc('/specification', specification)
 app.get('/docs', apiReference(reference))
 app.onError((err, c) => {

@@ -17,24 +17,26 @@
     "build": "bun build src/index.ts --minify --outdir dist --outfile=index.js",
     "lint": "bunx @biomejs/biome lint --apply src",
     "format": "bunx @biomejs/biome format --write src",
-    "prepare": "husky"
+    "prepare": "husky",
+    "deploy": "wrangler deploy",
+    "deploy:dev": "wrangler deploy --env dev"
   },
   "dependencies": {
     "dayjs": "^1.11.13",
-    "hono": "^4.6.1",
+    "hono": "^4.6.2",
     "lint-staged": "^15.2.10",
     "lodash": "^4.17.21",
-    "stripe": "^16.11.0"
+    "stripe": "^16.12.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.1",
-    "@cloudflare/workers-types": "^4.20240909.0",
+    "@biomejs/biome": "^1.9.2",
+    "@cloudflare/workers-types": "^4.20240919.0",
     "@commitlint/cli": "^19.5.0",
     "@commitlint/config-conventional": "^19.5.0",
     "@commitlint/cz-commitlint": "^19.5.0",
     "@hono/zod-openapi": "^0.16.0",
-    "@scalar/hono-api-reference": "^0.5.146",
-    "@types/bun": "^1.1.9",
+    "@scalar/hono-api-reference": "^0.5.147",
+    "@types/bun": "^1.1.10",
     "@types/lodash": "^4.17.7",
     "@types/node": "^22.5.5",
     "commitizen": "^4.3.0",
