@@ -3,6 +3,7 @@ import { OpenAPIHono as Hono, createRoute, z } from '@hono/zod-openapi'
 import type { Context, Next } from 'hono'
 import { HTTPException } from 'hono/http-exception'
 import { decode, jwt, sign, verify } from 'hono/jwt'
+import { AlgorithmTypes } from 'hono/utils/jwt/jwa'
 import {
   type JWTPayload,
   JwtAlgorithmNotImplemented,
@@ -61,6 +62,16 @@ const JWTToken = z.object({
 
 type JWTToken = z.infer<typeof JWTToken>
 type Key = z.infer<typeof Key>
+
+/**
+ * 管理者のみがアクセスできるエンドポイント
+ * @param c
+ * @param next
+ * @returns
+ */
+export const bearerToken = async (c: Context<{ Bindings: Bindings }>, next: Next) => {
+  return jwt({ secret: c.env.JWT_SECRET_KEY, alg: AlgorithmTypes.HS256 })(c, next)
+}
 
 /**
  * 外部から提供されたJSON Web Tokenを検証します
