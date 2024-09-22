@@ -63,7 +63,7 @@ type JWTToken = z.infer<typeof JWTToken>
 type Key = z.infer<typeof Key>
 
 /**
- * 送信されたJSON Web Tokenを検証します
+ * 外部から提供されたJSON Web Tokenを検証します
  * 指定された機関が発行したJWT以外は通さない
  * @param c
  * @param next
@@ -88,8 +88,8 @@ export const jwtAuth = async (c: Context<{ Bindings: Bindings }>, next: Next) =>
     throw new HTTPException(401, { message: 'Unauthorized.' })
   }
   try {
-    const payload: JWTPayload = await verify(bearer, key, token.header.alg)
-    return jwt({ secret: c.env.JWT_SECRET_KEY, alg: 'RS256', cookie: '_gtoken' })(c, next)
+    console.log(await verify(bearer, key, token.header.alg))
+    await next()
   } catch (error) {
     if (error instanceof JwtTokenExpired) {
       throw new HTTPException(401, { message: 'Token has expired.' })
