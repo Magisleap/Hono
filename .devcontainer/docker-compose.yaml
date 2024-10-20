@@ -1,13 +1,11 @@
 services:
-  hono:
+  app:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        BUN_VERSION: 1.1.26
     volumes:
-      - node_modules:/home/bun/app/node_modules
-      - ../:/home/bun/app:cached
+      - node_modules:/home/vscode/app/node_modules
+      - ../:/home/vscode/app:cached
     ports:
       - 8787:8787
     tty: true
