@@ -5,6 +5,7 @@ import { cors } from 'hono/cors'
 import { csrf } from 'hono/csrf'
 import { HTTPException } from 'hono/http-exception'
 import { logger } from 'hono/logger'
+import { ZodError } from 'zod'
 import type { Bindings } from './utils/bindings'
 import { reference, specification } from './utils/docs'
 import { scheduled } from './utils/handler'
@@ -20,8 +21,11 @@ app.onError((err, c) => {
   if (err instanceof HTTPException) {
     return c.json({ message: err.message }, err.status)
   }
+  if (err instanceof ZodError) {
+    return c.json({ message: JSON.parse(err.message), description: err.cause }, 400)
+  }
   console.error(err)
-  return c.text('Internal Server Error', 500)
+  return c.json({ message: err.message }, 500)
 })
 app.notFound((c) => c.redirect('/docs'))
 

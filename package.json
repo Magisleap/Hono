@@ -14,9 +14,6 @@
     "dev": "wrangler dev src/index.ts --test-scheduled",
     "start:prod": "bun dist/index.js",
     "prebuild": "rimraf dist",
-    "build": "bun build src/index.ts --minify --outdir dist --outfile=index.js",
-    "lint": "bunx @biomejs/biome lint --apply src",
-    "format": "bunx @biomejs/biome format --write src",
     "prepare": "husky"
   },
   "dependencies": {
