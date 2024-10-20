@@ -1,2 +1,3 @@
-// biome-ignore lint/complexity/noBannedTypes: <explanation>
-export type Bindings = {}
+export type Bindings = {
+  JWT_PRIVATE_KEY: string
+}
