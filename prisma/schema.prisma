@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String    @id @default(cuid())
+  userId     BigInt    @unique @map("user_id") // Discord Id
+  customer   Customer? @relation(fields: [customerId], references: [customerId])
+  customerId String?   @unique @map("customer_id")
+
+  @@map("users")
+}
+
+model Customer {
+  id            String         @id @default(cuid())
+  customerId    String         @unique @map("customer_id")
+  user          User?          @relation
+  subscriptions Subscription[]
+
+  @@map("customers")
+}
+
+model Subscription {
+  id             String   @id @default(cuid())
+  subscriptionId String   @unique @map("subscription_id") // StripeのSubscription ID
+  customerId     String   @map("customer_id") // 紐づくCustomerのID
+  customer       Customer @relation(fields: [customerId], references: [customerId])
+  livemode       Boolean  @default(false)
+  status         String // 'active', 'canceled', 'incomplete', 'incomplete_expired', 'past_due', 'trialing', 'unpaid'
+  quantity       Int
+  invoice        Invoice  @relation(fields: [invoiceId], references: [invoiceId])
+  invoiceId      String   @map("invoice_id") // 紐づくInvoiceのID
+
+  @@map("subscriptions")
+}
+
+model Invoice {
+  id           String         @id @default(cuid())
+  invoiceId    String         @unique @map("invoice_id") // StripeのInvoice ID
+  method       String         @map("collection_method")
+  status       String         @map("status") // 'draft', 'open', 'paid', 'uncollectible', 'void'
+  subtotal     Int            @map("subtotal")
+  subscription Subscription[]
+
+  @@map("invoices")
+}

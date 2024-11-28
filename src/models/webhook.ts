@@ -1,6 +1,4 @@
-import { subscribe } from 'node:diagnostics_channel'
 import { z } from '@hono/zod-openapi'
-import { fromPairs, values } from 'lodash'
 import { DataObject } from './data.object.dto'
 
 export namespace Webhook {
