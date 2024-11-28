@@ -10,7 +10,6 @@ app.openapi(
   createRoute({
     method: HTTPMethod.GET,
     path: '/{customer_id}',
-    middleware: [],
     tags: ['顧客'],
     summary: '詳細取得',
     description: '顧客情報を取得します',
@@ -35,7 +34,7 @@ app.openapi(
   }),
   async (c) => {
     const stripe: Stripe = new Stripe(c.env.STRIPE_API_KEY_SECRET, {
-      apiVersion: '2024-06-20'
+      typescript: true
     })
     const { price_id } = c.req.valid('param')
     const price = await stripe.prices.retrieve(price_id)

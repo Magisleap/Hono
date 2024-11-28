@@ -93,7 +93,7 @@ app.openapi(
   async (c) => {
     const parameters = c.req.valid('json')
     const stripe: Stripe = new Stripe(c.env.STRIPE_API_KEY_SECRET, {
-      apiVersion: '2024-06-20'
+      typescript: true
     })
     const checkout = await stripe.checkout.sessions.create({
       after_expiration: {

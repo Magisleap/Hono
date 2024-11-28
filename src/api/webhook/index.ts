@@ -42,8 +42,7 @@ app.openapi(
     const { 'stripe-signature': signature } = c.req.valid('header')
     const buffer: Buffer = Buffer.from(await c.req.arrayBuffer())
     const stripe: Stripe = new Stripe(c.env.STRIPE_API_KEY_SECRET, {
-      typescript: true,
-      apiVersion: '2024-06-20'
+      typescript: true
     })
     const event: Stripe.Event = await stripe.webhooks.constructEventAsync(
       buffer,
@@ -75,6 +74,14 @@ const handle_session = async (c: Context<{ Bindings: Bindings }>, event: Webhook
   if (event.client_reference_id === undefined) {
     throw new HTTPException(400, { message: 'Bad Request.' })
   }
+  const stripe: Stripe = new Stripe(c.env.STRIPE_API_KEY_SECRET, {
+    typescript: true
+  })
+  await stripe.customers.update(event.customer, {
+    metadata: {
+      ...Object.fromEntries(event.custom_fields.map((field) => [field.key, field.text.value]))
+    }
+  })
   // 確実に書き込み完了するまで待つ
   await c.env.STRIPE_INVOICE_PAYMENT.put(event.customer, JSON.stringify(event))
 }

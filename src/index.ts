@@ -14,7 +14,7 @@ import { ZodError } from 'zod'
 import { app as checkout } from './api/checkout'
 import { app as prices } from './api/prices'
 import { app as products } from './api/products'
-import { app as subscriptions } from './api/subscriptions'
+import { app as users } from './api/users'
 import { app as webhook } from './api/webhook'
 import { jwtAuth } from './middlewares/jwt_auth'
 import type { Bindings } from './utils/bindings'
@@ -56,7 +56,7 @@ app.route('webhook', webhook)
 app.route('products', products)
 app.route('prices', prices)
 app.route('checkout', checkout)
-app.route('subscriptions', subscriptions)
+app.route('users', users)
 
 export default {
   port: 3000,

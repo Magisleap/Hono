@@ -1,20 +1,22 @@
 {
-  "name": "Stipe API",
+  "name": "Stripe API",
   "dockerComposeFile": ["docker-compose.yaml"],
   "service": "stripe",
-  "workspaceFolder": "/home/bun/app",
+  "workspaceFolder": "/home/vscode/app",
   "shutdownAction": "stopCompose",
-  "remoteUser": "bun",
+  "remoteUser": "vscode",
   "mounts": [
-    "source=${env:HOME}/home/bun/.ssh,target=/.ssh,type=bind,consistency=cached,readonly"
+    "source=${env:HOME}/home/vscode/.ssh,target=/.ssh,type=bind,consistency=cached,readonly"
   ],
   "features": {
     "ghcr.io/devcontainers/features/git:1": {
-      "version": "2.37.0"
+      "version": "2.39.0"
     },
+    "ghcr.io/devcontainers/features/aws-cli:1": {},
     "ghcr.io/devcontainers/features/common-utils:2": {
       "configureZshAsDefaultShell": true
     },
+    "ghcr.io/shyim/devcontainers-features/bun:0": {},
     "ghcr.io/devcontainers/features/node:1.5.0": {
       "version": "20.16.0"
     },
@@ -33,13 +35,14 @@
         "GitHub.copilot",
         "GitHub.copilot-chat",
         "PKief.material-icon-theme",
+        "Prisma.prisma",
         "antfu.file-nesting",
+        "bierner.markdown-mermaid",
+        "bierner.markdown-preview-github-styles",
         "biomejs.biome",
         "eamodio.gitlens",
         "ms-vscode.vscode-typescript-next",
-        "tamasfe.even-better-toml",
-        "bierner.markdown-mermaid",
-        "bierner.markdown-preview-github-styles"
+        "tamasfe.even-better-toml"
       ],
       "settings": {
         "betterTypeScriptErrors.prettify": true,

@@ -8,28 +8,14 @@ export const app = new Hono<{ Bindings: Bindings }>()
 app.openapi(
   createRoute({
     method: HTTPMethod.GET,
-    path: '/',
-    middleware: [jwtAuth],
-    tags: ['購読'],
-    summary: '一覧取得',
-    description: '購読一覧を取得します',
-    request: {
-      headers: z.object({
-        'x-api-key': z.string().optional().openapi({
-          description: 'APIキー'
-        })
-      })
-    },
+    path: '/{discord_user_id}/subscriptions',
+    tags: ['ユーザー'],
+    summary: '購読',
+    description: 'ユーザーが購読しているプラン一覧を返します',
     responses: {
       200: {
         type: 'application/json',
         description: '購読データ'
-      },
-      401: {
-        description: '認証エラー'
-      },
-      403: {
-        description: 'アクセス権限がありません'
       },
       ...BadRequestResponse({
         message: '不正なリクエストです'

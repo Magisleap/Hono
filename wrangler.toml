@@ -1,8 +1,8 @@
 name = "stripe_api"
 main = "src/index.ts"
-compatibility_date = "2024-07-22"
+compatibility_date = "2024-09-30"
 send_metrics = true
-compatibility_flags = ["nodejs_compat"]
+compatibility_flags = ["nodejs_compat_v2"]
 logpush = true
 
 # Cloudflare Workers R2 buckets
@@ -15,11 +15,25 @@ kv_namespaces = [
   { binding = "STRIPE_INVOICE_PAYMENT", id = "7b1cffc8ff7e491eb7e30c2edeed9b76", preview_id = "6fbe144d9d3c4269916d2dfcaa3027e8" },
 ]
 
+[[d1_databases]]
+binding = "DB"
+database_name = "discord_stripe"
+database_id = "d7af571e-c527-4f68-8650-a710cee8df5a"
+
 # Cron Events
 [triggers]
 crons = []
+
 
 # Variables
 [vars]
 
 [env.dev]
+
+[env.dev.observability]
+enabled = true
+head_sampling_rate = 1
+
+[dev]
+ip = "0.0.0.0"
+port = 8787
