@@ -3,20 +3,18 @@ import { apiReference } from '@scalar/hono-api-reference'
 import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
-import { cache } from 'hono/cache'
 import { cors } from 'hono/cors'
 import { csrf } from 'hono/csrf'
 import { HTTPException } from 'hono/http-exception'
 import { type JwtVariables as Variables, jwt } from 'hono/jwt'
 import { logger } from 'hono/logger'
-import { JwtTokenExpired } from 'hono/utils/jwt/types'
 import { ZodError } from 'zod'
 import { app as checkout } from './api/checkout'
 import { app as prices } from './api/prices'
 import { app as products } from './api/products'
 import { app as users } from './api/users'
 import { app as webhook } from './api/webhook'
-import { jwtAuth } from './middlewares/jwt_auth'
+import { prisma } from './middlewares/prisma.middleware'
 import type { Bindings } from './utils/bindings'
 import { reference, specification } from './utils/docs'
 import { scheduled } from './utils/handler'
@@ -37,6 +35,7 @@ dayjs.tz.setDefault('Asia/Tokyo')
 app.use(logger())
 app.use(csrf())
 app.use('*', cors())
+app.use('*', prisma)
 // app.use('*', jwtAuth)
 app.notFound((c) => c.redirect('/docs'))
 app.doc('/specification', specification)

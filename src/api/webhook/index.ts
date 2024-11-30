@@ -4,6 +4,7 @@ import { Webhook } from '@/models/webhook'
 import { BadRequestResponse } from '@/utils/bad_request.response'
 import type { Bindings } from '@/utils/bindings'
 import { OpenAPIHono as Hono, createRoute, z } from '@hono/zod-openapi'
+import { PrismaD1 } from '@prisma/adapter-d1'
 import dayjs from 'dayjs'
 import type { Context } from 'hono'
 import { HTTPException } from 'hono/http-exception'
@@ -29,7 +30,7 @@ app.openapi(
       })
     },
     responses: {
-      200: {
+      204: {
         type: 'application/json',
         description: '処理結果'
       },
@@ -55,9 +56,10 @@ app.openapi(
 )
 
 const handle_webhook = async (c: Context<{ Bindings: Bindings }>, event: Stripe.Event) => {
+  console.log(event.type)
   switch (event.type) {
     case 'checkout.session.completed':
-      return handle_session(c, Webhook.CheckoutSession.parse(event))
+      return await handle_session(c, Webhook.CheckoutSession.parse(event))
     case 'customer.subscription.created':
       break
     case 'customer.subscription.updated':
@@ -77,6 +79,7 @@ const handle_session = async (c: Context<{ Bindings: Bindings }>, event: Webhook
   const stripe: Stripe = new Stripe(c.env.STRIPE_API_KEY_SECRET, {
     typescript: true
   })
+
   await stripe.customers.update(event.customer, {
     metadata: {
       ...Object.fromEntries(event.custom_fields.map((field) => [field.key, field.text.value]))
@@ -86,18 +89,13 @@ const handle_session = async (c: Context<{ Bindings: Bindings }>, event: Webhook
   await c.env.STRIPE_INVOICE_PAYMENT.put(event.customer, JSON.stringify(event))
 }
 
+/**
+ *
+ * @param c
+ * @param event
+ */
 const handle_invoice_payment = async (c: Context<{ Bindings: Bindings }>, event: Webhook.InvoicePayment) => {
   console.log('[INVOICE PAYMENT SUCCEEDED]', JSON.stringify(event, null, 2))
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  const customer: any | null = await c.env.STRIPE_INVOICE_PAYMENT.get(event.customer, { type: 'json' })
-  if (customer === null) {
-    throw new HTTPException(404, { message: 'Not Found.' })
-  }
-  // 支払い情報をマージする
-  // このカスみたいな方法を利用しないと正しくマージされない
-  const payload = merge({}, customer, event.toJSON())
-  await c.env.STRIPE_INVOICE_PAYMENT.put(event.customer, JSON.stringify(payload))
-  return handle_token(c, payload)
 }
 
 const handle_token = async <T extends Webhook.InvoicePayment>(c: Context<{ Bindings: Bindings }>, event: T) => {
