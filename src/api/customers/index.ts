@@ -2,15 +2,16 @@ import { HTTPMethod } from '@/enums/method'
 import { BadRequestResponse } from '@/utils/bad_request.response'
 import type { Bindings } from '@/utils/bindings'
 import { OpenAPIHono as Hono, createRoute, z } from '@hono/zod-openapi'
-import Stripe from 'stripe'
+import { PrismaD1 } from '@prisma/adapter-d1'
+import { PrismaClient } from '@prisma/client'
 
 export const app = new Hono<{ Bindings: Bindings }>()
 
 app.openapi(
   createRoute({
     method: HTTPMethod.GET,
-    path: '/{customer_id}',
-    tags: ['顧客'],
+    path: '/{discord_user_id}',
+    tags: [''],
     summary: '詳細取得',
     description: '顧客情報を取得します',
     request: {
@@ -33,12 +34,11 @@ app.openapi(
     }
   }),
   async (c) => {
-    const stripe: Stripe = new Stripe(c.env.STRIPE_API_KEY_SECRET, {
-      typescript: true
-    })
-    const { price_id } = c.req.valid('param')
-    const price = await stripe.prices.retrieve(price_id)
-    const product = await stripe.products.retrieve(price.product as string)
-    return c.json({ ...price, ...product })
+    const { customer_id } = c.req.valid('param')
+
+    const adapter: PrismaD1 = new PrismaD1(c.env.DB)
+    const prisma: PrismaClient = new PrismaClient({ adapter })
+
+    return c.json({ customer_id })
   }
 )

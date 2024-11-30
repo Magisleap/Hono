@@ -1,9 +1,11 @@
 import { HTTPMethod } from '@/enums/method'
 import { Payment } from '@/enums/payment'
+import { StripeDTO } from '@/models/checkout.dto'
 import { BadRequestResponse } from '@/utils/bad_request.response'
 import type { Bindings } from '@/utils/bindings'
 import { OpenAPIHono as Hono, createRoute, z } from '@hono/zod-openapi'
 import dayjs from 'dayjs'
+import { HTTPException } from 'hono/http-exception'
 import Stripe from 'stripe'
 
 export const app = new Hono<{ Bindings: Bindings }>()
@@ -11,7 +13,7 @@ export const app = new Hono<{ Bindings: Bindings }>()
 app.openapi(
   createRoute({
     method: HTTPMethod.POST,
-    path: '/{price_id}',
+    path: '/',
     tags: ['決済'],
     summary: '詳細取得',
     description: '決済用のURLを取得します',
@@ -19,63 +21,7 @@ app.openapi(
       body: {
         content: {
           'application/json': {
-            schema: z.object({
-              client_reference_id: z.string().openapi({
-                default: '383683302801932289',
-                example: '383683302801932289',
-                description: 'クライアントID'
-              }),
-              price_id: z.string().openapi({
-                default: 'price_1PzOLFFHNegLdPHwOa5QLDJP',
-                example: 'price_1PzOLFFHNegLdPHwOa5QLDJP',
-                description: '価格ID'
-              }),
-              mode: z.nativeEnum(Payment).openapi({
-                default: Payment.SUBSCRIPTION,
-                example: Payment.SUBSCRIPTION,
-                description: '購入モード'
-              }),
-              quantity: z.number().openapi({
-                default: 1,
-                example: 1,
-                description: '数量'
-              }),
-              return_url: z.string().url().openapi({
-                default: 'https://example.com/return',
-                example: 'https://example.com/return',
-                description: 'リダイレクトURL'
-              }),
-              success_url: z.string().url().openapi({
-                default: 'https://example.com/success',
-                example: 'https://example.com/success',
-                description: '成功時のリダイレクトURL'
-              }),
-              cancel_url: z.string().url().openapi({
-                default: 'https://example.com/cancel',
-                example: 'https://example.com/cancel',
-                description: 'キャンセル時のリダイレクトURL'
-              }),
-              custom_fields: z
-                .array(
-                  z.object({
-                    key: z.string(),
-                    label: z.object({
-                      type: z.enum(['custom']),
-                      custom: z.string()
-                    }),
-                    text: z
-                      .object({
-                        minimum_length: z.number().optional(),
-                        maximum_length: z.number().optional(),
-                        default_value: z.string().optional()
-                      })
-                      .optional(),
-                    type: z.enum(['text'])
-                  })
-                )
-                .optional(),
-              metadata: z.record(z.string().or(z.number())).optional()
-            })
+            schema: StripeDTO.Checkout.Request
           }
         }
       }
@@ -102,7 +48,7 @@ app.openapi(
           allow_promotion_codes: true
         }
       },
-      custom_fields: parameters.custom_fields,
+      // custom_fields: parameters.custom_fields,
       success_url: parameters.success_url,
       cancel_url: parameters.cancel_url,
       client_reference_id: parameters.client_reference_id,
@@ -113,10 +59,14 @@ app.openapi(
           quantity: parameters.quantity
         }
       ],
-      locale: 'ja',
+      locale: parameters.locale,
       metadata: parameters.metadata,
       mode: parameters.mode
     })
-    return c.json(checkout)
+    if (checkout.url === null) {
+      throw new HTTPException(404, { message: 'Not Found.' })
+    }
+    return c.json({ url: checkout.url })
+    // return c.redirect(checkout.url)
   }
 )
