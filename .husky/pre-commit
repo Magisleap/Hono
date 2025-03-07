@@ -1,2 +1,4 @@
+#!/bin/sh
+
 bun test
-bun run lint-staged
+bun lint-staged
