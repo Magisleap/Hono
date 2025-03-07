@@ -1,13 +1,20 @@
 services:
+<<<<<<< HEAD
   app:
+=======
+  node:
+>>>>>>> 902ba21 (ci(husky): add shebangs and modify pre-commit and prepare-commit-msg scripts)
     build:
       context: .
       dockerfile: Dockerfile
     volumes:
       - node_modules:/home/vscode/app/node_modules
       - ../:/home/vscode/app:cached
+<<<<<<< HEAD
     ports:
       - 8787:8787
+=======
+>>>>>>> 902ba21 (ci(husky): add shebangs and modify pre-commit and prepare-commit-msg scripts)
     tty: true
     stdin_open: true
 

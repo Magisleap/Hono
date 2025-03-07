@@ -1,1 +1,1 @@
-FROM mcr.microsoft.com/devcontainers/base:dev-ubuntu-24.04
+FROM mcr.microsoft.com/devcontainers/javascript-node:22-bookworm
