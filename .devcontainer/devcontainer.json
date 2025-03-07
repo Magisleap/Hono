@@ -1,11 +1,7 @@
 {
   "name": "Hono",
   "dockerComposeFile": ["docker-compose.yaml"],
-<<<<<<< HEAD
-  "service": "app",
-=======
   "service": "node",
->>>>>>> 902ba21 (ci(husky): add shebangs and modify pre-commit and prepare-commit-msg scripts)
   "workspaceFolder": "/home/vscode/app",
   "shutdownAction": "stopCompose",
   "remoteUser": "vscode",
@@ -14,11 +10,7 @@
   ],
   "features": {
     "ghcr.io/devcontainers/features/git:1": {
-<<<<<<< HEAD
-      "version": "2.39.0"
-=======
       "version": "2.48.1"
->>>>>>> 902ba21 (ci(husky): add shebangs and modify pre-commit and prepare-commit-msg scripts)
     },
     "ghcr.io/devcontainers/features/aws-cli:1": {},
     "ghcr.io/devcontainers/features/common-utils:2": {
